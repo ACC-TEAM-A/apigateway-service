@@ -80,7 +80,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           envs: GITHUB_SHA
           script: |
-            sudo docker rm -f $(docker ps -qa)
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/apigateway
             docker image prune -f
+            docker stop apigateway
             docker-compose -f docker-compose-gateway.yml up -d
