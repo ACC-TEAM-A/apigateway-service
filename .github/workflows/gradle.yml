@@ -36,6 +36,7 @@ jobs:
       - name: create application.yml
         if: contains(github.ref, 'main')
         run: |
+          mkdir -p src/main/resources
           cd ./src/main/resources
           touch ./application.yml
           echo "${{ secrets.PROPERTIES_LOCAL }}" > ./application.yml
