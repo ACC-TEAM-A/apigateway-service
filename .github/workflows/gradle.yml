@@ -37,10 +37,9 @@ jobs:
         if: contains(github.ref, 'main')
         run: |
           mkdir -p src/main/resources
-          cd ./src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.PROPERTIES_LOCAL }}" > ./application.yml
-        shell: bash
+          echo "$APPLICATION" > src/main/resources/application.yml
+        env:
+          APPLICATION: ${{ secrets.PROPERTIES_LOCAL }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
