@@ -1,0 +1,19 @@
+version: '3'
+services:
+  apigateway:
+    image: accteama/apigateway
+    depends_on:
+      - eureka
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://3.38.233.119:8761/eureka/
+    ports:
+      - 8888:8888
+    networks:
+      - msa-network
+
+  eureka:
+    image: accteama/eureka:latest
+    ports:
+      - 8761:8761 # Eureka 서비스 포트 설정
+    networks:
+      - msa-network
