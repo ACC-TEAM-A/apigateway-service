@@ -82,5 +82,5 @@ jobs:
           script: |
             sudo docker rm -f $(docker ps -qa)
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/apigateway
-            docker-compose up -d
             docker image prune -f
+            docker-compose -f docker-compose-gateway.yml up -d
