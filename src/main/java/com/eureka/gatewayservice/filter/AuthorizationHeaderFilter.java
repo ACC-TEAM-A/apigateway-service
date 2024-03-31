@@ -42,9 +42,6 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
 
-            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
-            }
 
             HttpHeaders headers = request.getHeaders();
 
@@ -55,6 +52,12 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 return chain.filter(exchange.mutate().request(newRequest).build());
 
             }
+
+//            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+//                return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
+//            }
+
+
 
             Set<String> keys = headers.keySet();
             log.info(">>>");
