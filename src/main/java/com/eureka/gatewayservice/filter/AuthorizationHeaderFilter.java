@@ -1,8 +1,6 @@
 package com.eureka.gatewayservice.filter;
 
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
@@ -21,6 +19,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Date;
 import java.util.Set;
 
 @Component
@@ -72,7 +71,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
             String jwt = authorizationHeader.replace("Bearer", "");
 
-            if (!isJwtValid(jwt)) {
+            if (!validateToken(jwt)) {
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
 
@@ -90,28 +89,20 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         return response.writeWith(Flux.just(buffer));
     }
 
-    private boolean isJwtValid(String jwt) {
-        byte[] secretKeyBytes = Base64.getEncoder().encode(secret.getBytes());
-        SecretKey signingKey = new SecretKeySpec(secretKeyBytes, SignatureAlgorithm.HS512.getJcaName());
-
-        boolean returnValue = true;
-        String subject = null;
-
+    public boolean validateToken(String token) {
         try {
-            JwtParser jwtParser = Jwts.parserBuilder()
-                    .setSigningKey(signingKey)
-                    .build();
-
-            subject = jwtParser.parseClaimsJws(jwt).getBody().getSubject();
-        } catch (Exception ex) {
-            returnValue = false;
+            // Bearer 검증
+            if (!token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
+                return false;
+            } else {
+                token = token.split(" ")[1].trim();
+            }
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
+            // 만료되었을 시 false
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (Exception e) {
+            return false;
         }
-
-        if (subject == null || subject.isEmpty()) {
-            returnValue = false;
-        }
-
-        return returnValue;
     }
 
 }
