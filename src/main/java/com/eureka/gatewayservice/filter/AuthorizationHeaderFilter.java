@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLOutput;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Set;
@@ -93,6 +94,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         try {
             // Bearer 검증
             if (!token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
+                System.out.println(token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER "));
                 return false;
             } else {
                 token = token.split(" ")[1].trim();
@@ -101,6 +103,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             // 만료되었을 시 false
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
+            System.out.println(token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER "));
+            e.printStackTrace();
             return false;
         }
     }
