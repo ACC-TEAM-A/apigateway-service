@@ -3,6 +3,7 @@ package com.eureka.gatewayservice.filter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,17 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
             ServerHttpResponse response = exchange.getResponse();
 
             log.info("Custom PRE filter: request id -> {}", request.getId());
+
+
+            HttpHeaders headers = request.getHeaders();
+            if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
+                ServerHttpRequest newRequest = request.mutate()
+                        .header(request.getId(), "guest")
+                        .build();
+                return chain.filter(exchange.mutate().request(newRequest).build());
+
+            }
+
 
             // Custom Post Filter
             return chain.filter(exchange).then(Mono.fromRunnable(() -> {
