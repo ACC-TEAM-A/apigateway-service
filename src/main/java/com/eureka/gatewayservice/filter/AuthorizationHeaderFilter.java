@@ -47,7 +47,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
             if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
                 ServerHttpRequest newRequest = request.mutate()
-                        .header(request.getId(), "guest")
+                        .header("id", "guest")
                         .build();
                 return chain.filter(exchange.mutate().request(newRequest).build());
 
