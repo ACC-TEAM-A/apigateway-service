@@ -26,16 +26,6 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Conf
             log.info("Custom PRE filter: request id -> {}", request.getId());
 
 
-            HttpHeaders headers = request.getHeaders();
-            if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
-                ServerHttpRequest newRequest = request.mutate()
-                        .header(request.getId(), "guest")
-                        .build();
-                return chain.filter(exchange.mutate().request(newRequest).build());
-
-            }
-
-
             // Custom Post Filter
             return chain.filter(exchange).then(Mono.fromRunnable(() -> {
                 log.info("Custom POST filter: response code -> {}", response.getStatusCode());

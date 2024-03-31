@@ -47,6 +47,15 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             }
 
             HttpHeaders headers = request.getHeaders();
+
+            if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
+                ServerHttpRequest newRequest = request.mutate()
+                        .header(request.getId(), "guest")
+                        .build();
+                return chain.filter(exchange.mutate().request(newRequest).build());
+
+            }
+
             Set<String> keys = headers.keySet();
             log.info(">>>");
             keys.forEach(v -> {
@@ -55,6 +64,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             log.info("<<<");
 
             String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
+
+
+
             String jwt = authorizationHeader.replace("Bearer", "");
 
             if (!isJwtValid(jwt)) {
