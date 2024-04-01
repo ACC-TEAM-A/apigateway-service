@@ -70,9 +70,8 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
 
 
-            String jwt = authorizationHeader.replace("Bearer", "");
 
-            if (!validateToken(jwt)) {
+            if (!validateToken(authorizationHeader)) {
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
 
@@ -93,13 +92,20 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
     public boolean validateToken(String token) {
         try {
             // Bearer 검증
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(Base64.getDecoder().decode(secret)).build().parseClaimsJws(token);
+            if (!token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
+                return false;
+            } else {
+                token = token.split(" ")[1].trim();
+            }
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
             // 만료되었을 시 false
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
-            e.printStackTrace();
             return false;
         }
     }
+
+
+
 
 }
