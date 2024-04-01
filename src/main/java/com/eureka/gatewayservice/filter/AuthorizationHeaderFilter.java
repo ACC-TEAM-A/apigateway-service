@@ -97,10 +97,11 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 System.out.println("if" + token);
 
                 return false;
-            } else {
-                token = token.substring("BEARER ".length()).trim();
-                System.out.println("else" + token);
             }
+            token = token.substring("BEARER ".length()).trim();
+
+            System.out.println("else " + token);
+
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secret)
                     .build()
