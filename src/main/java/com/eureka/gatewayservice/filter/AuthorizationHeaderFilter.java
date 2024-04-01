@@ -93,6 +93,9 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         try {
             // Bearer 검증
             if (!token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
+
+                System.out.println(token);
+
                 return false;
             } else {
                 token = token.split(" ")[1].trim();
