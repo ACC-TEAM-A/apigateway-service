@@ -101,10 +101,18 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
                 token = token.substring("BEARER ".length()).trim();
                 System.out.println("else" + token);
             }
-            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
-            // 만료되었을 시 false
-            System.out.println("!if&else" + token);
-            return !claims.getBody().getExpiration().before(new Date());
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(secret)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            // 토큰의 만료 시간을 확인하여 유효한지 검증
+            Date expiration = claims.getExpiration();
+            Date now = new Date();
+            if (expiration != null && expiration.before(now)) {
+                return false;
+            }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
