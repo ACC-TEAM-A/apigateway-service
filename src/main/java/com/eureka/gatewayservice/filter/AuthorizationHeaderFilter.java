@@ -94,16 +94,19 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
             // Bearer 검증
             if (!token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
 
-                System.out.println(token);
+                System.out.println("if" + token);
 
                 return false;
             } else {
                 token = token.split(" ")[1].trim();
+                System.out.println("else" + token);
             }
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(secret).build().parseClaimsJws(token);
             // 만료되었을 시 false
+            System.out.println("!if&else" + token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
