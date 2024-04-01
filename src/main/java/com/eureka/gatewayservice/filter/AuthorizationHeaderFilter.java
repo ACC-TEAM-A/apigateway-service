@@ -1,5 +1,6 @@
 package com.eureka.gatewayservice.filter;
 
+import com.eureka.gatewayservice.security.JwtProvider;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,8 +27,8 @@ import java.util.Set;
 @Component
 @Slf4j
 public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<AuthorizationHeaderFilter.Config> {
-    @Value("${token.secret}")
-    private String secret;
+//    @Value("${}")
+//    private String secret;
 
     public AuthorizationHeaderFilter() {
         super(Config.class);
@@ -71,7 +72,7 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
 
 
 
-            if (!validateToken(authorizationHeader)) {
+            if (!JwtProvider.validateToken(authorizationHeader)) {
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
 
@@ -89,36 +90,36 @@ public class AuthorizationHeaderFilter extends AbstractGatewayFilterFactory<Auth
         return response.writeWith(Flux.just(buffer));
     }
 
-    public boolean validateToken(String token) {
-        try {
-            // Bearer 검증
-            if (!token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
-
-                System.out.println("if" + token);
-
-                return false;
-            }
-            token = token.substring("BEARER ".length()).trim();
-
-            System.out.println("else " + token);
-
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(secret)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-            // 토큰의 만료 시간을 확인하여 유효한지 검증
-            Date expiration = claims.getExpiration();
-            Date now = new Date();
-            if (expiration != null && expiration.before(now)) {
-                return false;
-            }
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
+//    public boolean validateToken(String token) {
+//        try {
+//            // Bearer 검증
+//            if (!token.substring(0, "BEARER ".length()).equalsIgnoreCase("BEARER ")) {
+//
+//                System.out.println("if" + token);
+//
+//                return false;
+//            }
+//            token = token.substring("BEARER ".length()).trim();
+//
+//            System.out.println("else " + token);
+//
+//            Claims claims = Jwts.parserBuilder()
+//                    .setSigningKey(secret)
+//                    .build()
+//                    .parseClaimsJws(token)
+//                    .getBody();
+//            // 토큰의 만료 시간을 확인하여 유효한지 검증
+//            Date expiration = claims.getExpiration();
+//            Date now = new Date();
+//            if (expiration != null && expiration.before(now)) {
+//                return false;
+//            }
+//            return true;
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
 
 
 
